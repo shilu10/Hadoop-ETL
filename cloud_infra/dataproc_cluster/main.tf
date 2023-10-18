@@ -2,12 +2,12 @@
 ## dataproc cluster
 
 resource "google_service_account" "default" {
-  account_id   = "109018496839556062668"
-  display_name = "Compute Engine default service account"
+  account_id   = "dataproc_service_acc_id"
+  display_name = "DataProc cluster Service account"
 }
 
 resource "google_dataproc_cluster" "mycluster" {
-  name     = "dev_demo"
+  name     = "devdemo"
   region   = "us-central1"
   graceful_decommission_timeout = "120s"
   labels = {
