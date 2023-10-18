@@ -2,7 +2,7 @@
 ## dataproc cluster
 
 data "google_service_account" "this" {
-  account_id = "103194823095497109100"
+  account_id = "5005838637-compute"
 }
 
 resource "google_dataproc_cluster" "mycluster" {
@@ -15,24 +15,6 @@ resource "google_dataproc_cluster" "mycluster" {
 
   cluster_config {
     staging_bucket = "dataproc-staging-bucket"
-
-    master_config {
-      num_instances = 1
-      machine_type  = "e2-medium"
-      disk_config {
-        boot_disk_type    = "pd-ssd"
-        boot_disk_size_gb = 30
-      }
-    }
-
-    worker_config {
-      num_instances    = 2
-      machine_type     = "e2-medium"
-      min_cpu_platform = "Intel Skylake"
-      disk_config {
-        boot_disk_size_gb = 30
-        num_local_ssds    = 1
-      }
     }
 
     preemptible_worker_config {
@@ -59,6 +41,11 @@ resource "google_dataproc_cluster" "mycluster" {
     # You can define multiple initialization_action blocks
     initialization_action {
       script      = "gs://dataproc-initialization-actions/stackdriver/stackdriver.sh"
+      timeout_sec = 500
+    }
+  }
+  initialization_action {
+      script      = "gs://dataproc-initialization-actions/sqoop/sqoop.sh"
       timeout_sec = 500
     }
   }
