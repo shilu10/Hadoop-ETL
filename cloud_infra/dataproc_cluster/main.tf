@@ -1,9 +1,8 @@
 
 ## dataproc cluster
 
-resource "google_service_account" "default" {
-  account_id   = "dataproc_service_acc_id"
-  display_name = "DataProc cluster Service account"
+data "google_service_account" "this" {
+  account_id = "103194823095497109100"
 }
 
 resource "google_dataproc_cluster" "mycluster" {
@@ -51,7 +50,7 @@ resource "google_dataproc_cluster" "mycluster" {
     gce_cluster_config {
       tags = ["foo", "bar"]
       # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
-      service_account = google_service_account.default.email
+      service_account = data.google_service_account.this.email
       service_account_scopes = [
         "cloud-platform"
       ]
