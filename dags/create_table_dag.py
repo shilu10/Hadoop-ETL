@@ -81,16 +81,16 @@ geolocation_create_table = MySqlOperator(sql=geolocation_createT_sql_statement,
                 dag=dag_mysql)
 
 
-orders_createT_sql_statement = """ CREATE TABLE demo.order(order_id VARCHAR(30) PRIMARY KEY, 
+orders_createT_sql_statement = """ CREATE TABLE demo.orders(order_id VARCHAR(30) PRIMARY KEY, 
                                   customer_id VARCHAR(100) NOT NULL,
                                   order_status CHAR(30) NOT NULL,
                                   order_purchase_timestamp CHAR(30), 
                                   order_approved_at CHAR(30), 
                                   order_delivered_carrier_date CHAR(30), 
                                   order_delivered_customer_date CHAR(30), 
-                                  order_estimated_delivery_date CHAR(30) NOT NULL
+                                  order_estimated_delivery_date CHAR(30) NOT NULL, 
                                   FOREIGN KEY (customer_id)
-                                    REFERENCES customer (customer_id) 
+                                    REFERENCES customer(customer_id) 
                                     ON DELETE CASCADE); """
 
 orders_create_table = MySqlOperator(sql=orders_createT_sql_statement, 
@@ -105,14 +105,14 @@ orders_item_createT_sql_statement = """ CREATE TABLE demo.order_item(order_id VA
                                   seller_id VARCHAR(100) NOT NULL, 
                                   shipping_limit_date CHAR(100), 
                                   price FLOAT, 
-                                  freight_value FLOAT
+                                  freight_value FLOAT,
                                   FOREIGN KEY (order_id)
-                                    REFERENCES order(order_id)
-                                    ON DELETE CASCADE
+                                    REFERENCES orders(order_id)
+                                    ON DELETE CASCADE,
 
                                   FOREIGN KEY (product_id)
                                     REFERENCES product(product_id)
-                                    ON DELETE CASCADE 
+                                    ON DELETE CASCADE,
 
                                   FOREIGN KEY (seller_id)
                                     REFERENCES seller(seller_id)
@@ -130,7 +130,7 @@ orders_payment_createT_sql_statement = """ CREATE TABLE demo.order_payment(order
                                   payment_value FLOAT NOT NULL
 
                                   FOREIGN KEY (order_id)
-                                    REFERENCES order(order_id)
+                                    REFERENCES orders(order_id)
                                     ON DELETE CASCADE); """
 
 
@@ -149,7 +149,7 @@ orders_review_createT_sql_statement = """ CREATE TABLE demo.order_review(order_i
                                   review_answer_timestamp VARCHAR(100)
 
                                   FOREIGN KEY (order_id)
-                                    REFERENCES order(order_id)
+                                    REFERENCES orders(order_id)
                                     ON DELETE CASCADE); """
 
 orders_review_create_table = MySqlOperator(sql=orders_review_createT_sql_statement, 
@@ -158,4 +158,4 @@ orders_review_create_table = MySqlOperator(sql=orders_review_createT_sql_stateme
                 dag=dag_mysql)
 
 
-customer_create_table >> seller_create_table >> products_create_table >> geolocation_create_table >> orders_create_table >> orders_item_create_table >> orders_payment_create_table >> orders_review_create_table
+[customer_create_table, seller_create_table, geolocation_create_table, products_create_table] >> orders_create_table >> [orders_item_createT_sql_statement, orders_payment_create_table, orders_review_create_table]
