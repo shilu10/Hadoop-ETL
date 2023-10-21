@@ -4,6 +4,7 @@ from airflow import DAG
 from airflow.providers.ssh.operators.ssh import SSHOperator
 from airflow.operators.mysql_operator import MySqlOperator
 from airflow.utils.dates import days_ago
+from airflow.operators.empty import EmptyOperator
 
 
 default_args = { 'owner': 'shilu',
@@ -157,5 +158,7 @@ orders_review_create_table = MySqlOperator(sql=orders_review_createT_sql_stateme
                 mysql_conn_id="mysql_conn", 
                 dag=dag_mysql)
 
+task1 = EmptyOperator(task_id="task1")
 
-[customer_create_table, seller_create_table, geolocation_create_table, products_create_table] >> orders_create_table >> [orders_item_createT_sql_statement, orders_payment_create_table, orders_review_create_table]
+
+task1 >> [customer_create_table, seller_create_table, geolocation_create_table, products_create_table] >> orders_create_table >> [orders_item_createT_sql_statement, orders_payment_create_table, orders_review_create_table]
