@@ -20,8 +20,8 @@ default_args = { 'owner': 'shilu',
 
 
 dag_mysql = DAG(
-    dag_id='mysqloperator_demo',
-    default_args=args,
+    dag_id='mysql_table_creation',
+    default_args=default_args,
     # schedule_interval='0 0 * * *',
     schedule_interval='@once',
     start_date=days_ago(1),
@@ -97,7 +97,7 @@ orders_create_table = MySqlOperator(sql=orders_createT_sql_statement,
                 dag=dag_mysql)
 
 
-orders_item_createT_sql_statement = """ CREATE TABLE demo.order(order_id VARCHAR(100), 
+orders_item_createT_sql_statement = """ CREATE TABLE demo.order_item(order_id VARCHAR(100), 
                                   product_id VARCHAR(100),
                                   order_item_id INT,
                                   seller_id VARCHAR(100), 
@@ -110,5 +110,30 @@ orders_item_create_table = MySqlOperator(sql=orders_item_createT_sql_statement,
                 mysql_conn_id="mysql_conn", 
                 dag=dag_mysql)
 
+orders_payment_createT_sql_statement = """ CREATE TABLE demo.order_payment(order_id VARCHAR(100), 
+                                  payment_sequential INT,
+                                  payment_type CHAR(20),
+                                  payment_installments INT, 
+                                  payment_value FLOAT); """
 
-customer_create_table >> seller_create_table >> products_create_table >> geolocation_create_table >> orders_create_table >> orders_item_create_table
+orders_payment_create_table = MySqlOperator(sql=orders_payment_createT_sql_statement, 
+                task_id="OrdersPaymentTableCreation",
+                mysql_conn_id="mysql_conn", 
+                dag=dag_mysql)
+
+
+orders_review_createT_sql_statement = """ CREATE TABLE demo.order_review(order_id VARCHAR(100), 
+                                  review_id VARCHAR(100),
+                                  review_score INT,
+                                  review_comment_title CHAR(10), 
+                                  review_comment_message VARCHAR(100), 
+                                  review_creation_date VARCHAR(100), 
+                                  review_answer_timestamp VARCHAR(100)); """
+
+orders_review_create_table = MySqlOperator(sql=orders_review_createT_sql_statement, 
+                task_id="OrdersRerviewTableCreation",
+                mysql_conn_id="mysql_conn", 
+                dag=dag_mysql)
+
+
+customer_create_table >> seller_create_table >> products_create_table >> geolocation_create_table >> orders_create_table >> orders_item_create_table >> orders_payment_create_table >> orders_review_create_table
