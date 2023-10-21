@@ -8,6 +8,7 @@ from mysql.connector import errorcode
 import mysql.connector
 import sys 
 
+
 CONN = mysql.connector.connect(host="35.202.49.158", 
                               username="root", 
                               password="shilu1234"
@@ -25,7 +26,7 @@ default_args = { 'owner': 'shilu',
          # If a task fails, retry it once after waiting 
          # at least 5 minutes 
          #'retries': 1,
-         'retry_delay': timedelta(minutes=5),
+         'retry_delay': timedelta(minutes=5),}
 
 
 
@@ -74,6 +75,109 @@ customer_table_insert_statement_task = PythonOperator(
                                     )
 
 
+def seller_table_insert_statement(): 
+    df = pd.read_csv("/home/airflow/gcs/data/olist_seller_dataset.csv")
+
+    count = 0 
+    for indx, row in df.iterrows():
+        seller_id = row['seller_id']
+        seller_zip_code_prefix = row['seller_zip_code_prefix']
+        seller_city = row['seller_city']
+        seller_state = row['seller_state']
+
+        sql_insert_statement = "INSERT INTO demo.seller (seller_id, seller_zip_code_prefix, \
+                seller_city, seller_state) VALUES (%s, %s, %s, %s)"
 
 
+        if count < 200:
+            CURSOR.execute(sql_insert_statement, 
+                            (seller_id, seller_zip_code_prefix, 
+                                seller_city, seller_state))
+            CONN.commit()
+            count += 1 
 
+
+        else:
+            sys.exit()
+
+
+seller_table_insert_statement_task = PythonOperator(
+                                        task_id="seller_table_insert_statement",
+                                        callable=seller_table_insert_statement,
+                                        dag=insert_db_dag
+                                    )
+
+
+def geolocation_table_insert_statement(): 
+    df = pd.read_csv("/home/airflow/gcs/data/olist_geolocation_dataset.csv")
+
+    count = 0 
+    for indx, row in df.iterrows():
+        geolocation_zip_code_prefix = row['geolocation_zip_code_prefix']
+        geolocation_lat = row['geolocation_lat']
+        geolocation_lng = row['geolocation_lng']
+        geolocation_city = row['geolocation_city']
+        geolocation_state = row['geolocation_state']
+
+        sql_insert_statement = "INSERT INTO demo.geolocation (geolocation_zip_code_prefix, geolocation_lat, \
+                geolocation_lng, geolocation_city, geolocation_state) VALUES (%s, %s, %s, %s, %s)"
+
+
+        if count < 200:
+            CURSOR.execute(sql_insert_statement, 
+                            (geolocation_zip_code_prefix, geolocation_lat, 
+                                geolocation_lng, geolocation_city, geolocation_state))
+            CONN.commit()
+            count += 1 
+
+
+        else:
+            sys.exit()
+
+
+geolocation_table_insert_statement_task = PythonOperator(
+                                        task_id="geolocation_table_insert_statement",
+                                        callable=geolocation_table_insert_statement,
+                                        dag=insert_db_dag
+                                    )
+
+
+def product_table_insert_statement(): 
+    df = pd.read_csv("/home/airflow/gcs/data/olist_product_dataset.csv")
+
+    count = 0 
+    for indx, row in df.iterrows():
+        product_id = row['product_id']
+        product_category_name = row['product_category_name']
+        product_name_length = row['product_name_length']
+        product_description_lenght = row['product_description_lenght']
+        product_photos_qty = row['product_photos_qty']
+        product_weight_g = row['product_weight_g']
+        product_length_cm = row['product_length_cm']
+        product_height_cm = row['product_height_cm']
+        product_width_cm = row['product_width_cm']
+
+        sql_insert_statement = "INSERT INTO demo.product (product_id, product_category_name, \
+                product_name_length, product_description_lenght, product_photos_qty, \
+                product_weight_g, product_length_cm, product_height_cm, product_width_cm) \
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+
+
+        if count < 200:
+            CURSOR.execute(sql_insert_statement, 
+                            (product_id, product_category_name, product_name_length, 
+                                product_description_lenght, product_photos_qty, product_weight_g, 
+                                product_length_cm, product_height_cm, product_width_cm))
+            CONN.commit()
+            count += 1 
+
+
+        else:
+            sys.exit()
+
+
+product_table_insert_statement_task = PythonOperator(
+                                        task_id="product_table_insert_statement",
+                                        callable=product_table_insert_statement,
+                                        dag=insert_db_dag
+                                    )
