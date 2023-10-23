@@ -7,6 +7,8 @@ from airflow.operators.python import PythonOperator
 from mysql.connector import errorcode
 import mysql.connector
 import sys 
+import pandas as pd 
+import numpy as np 
 
 
 CONN = mysql.connector.connect(host="35.202.49.158", 
@@ -26,7 +28,8 @@ default_args = { 'owner': 'shilu',
          # If a task fails, retry it once after waiting 
          # at least 5 minutes 
          #'retries': 1,
-         'retry_delay': timedelta(minutes=5),}
+         'retry_delay': timedelta(minutes=2)
+        }
 
 
 
@@ -70,7 +73,7 @@ def customer_table_insert_statement():
 
 customer_table_insert_statement_task = PythonOperator(
                                         task_id="customer_table_insert_statement",
-                                        callable=customer_table_insert_statement,
+                                        python_callable=customer_table_insert_statement,
                                         dag=insert_db_dag
                                     )
 
@@ -103,7 +106,7 @@ def seller_table_insert_statement():
 
 seller_table_insert_statement_task = PythonOperator(
                                         task_id="seller_table_insert_statement",
-                                        callable=seller_table_insert_statement,
+                                        python_callable=seller_table_insert_statement,
                                         dag=insert_db_dag
                                     )
 
@@ -137,7 +140,7 @@ def geolocation_table_insert_statement():
 
 geolocation_table_insert_statement_task = PythonOperator(
                                         task_id="geolocation_table_insert_statement",
-                                        callable=geolocation_table_insert_statement,
+                                        python_callable=geolocation_table_insert_statement,
                                         dag=insert_db_dag
                                     )
 
@@ -178,6 +181,160 @@ def product_table_insert_statement():
 
 product_table_insert_statement_task = PythonOperator(
                                         task_id="product_table_insert_statement",
-                                        callable=product_table_insert_statement,
+                                        python_callable=product_table_insert_statement,
                                         dag=insert_db_dag
                                     )
+
+
+def order_table_insert_statement(): 
+    df = pd.read_csv("/home/airflow/gcs/data/olist_order_dataset.csv")
+
+    count = 0 
+    for indx, row in df.iterrows():
+        order_id = row['order_id']
+        customer_id = row['customer_id']
+        order_status = row['order_status']
+        order_purchase_timestamp = row['order_purchase_timestamp']
+        order_approved_at = row['order_approved_at']
+        order_delivered_carrier_date = row['order_delivered_carrier_date']
+        order_delivered_customer_date = row['order_delivered_customer_date']
+        order_estimated_delivery_date = row['order_estimated_delivery_date']
+
+        sql_insert_statement = "INSERT INTO demo.product (order_id, customer_id, \
+                order_status, order_purchase_timestamp, order_approved_at, \
+                order_delivered_carrier_date, order_delivered_customer_date, order_estimated_delivery_date) \
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+
+
+        if count < 200:
+            CURSOR.execute(sql_insert_statement, 
+                            (order_id, customer_id, order_status, 
+                                order_purchase_timestamp, order_approved_at, order_delivered_carrier_date, 
+                                order_delivered_customer_date, order_estimated_delivery_date))
+            CONN.commit()
+            count += 1 
+
+
+        else:
+            sys.exit()
+
+
+order_table_insert_statement_task = PythonOperator(
+                                        task_id="order_table_insert_statement",
+                                        python_callable=order_table_insert_statement,
+                                        dag=insert_db_dag
+                                    )
+
+
+def order_item_table_insert_statement(): 
+    df = pd.read_csv("/home/airflow/gcs/data/olist_order_dataset.csv")
+
+    count = 0 
+    for indx, row in df.iterrows():
+        order_id = row['order_id']
+        product_id = row['product_id']
+        order_item_id = row['order_item_id']
+        seller_id = row['seller_id']
+        shipping_limit_date = row['shipping_limit_date']
+        price = row['price']
+        freight_value = row['freight_value']
+
+        sql_insert_statement = "INSERT INTO demo.product (order_id, product_id, \
+                order_item_id, seller_id, shipping_limit_date, price, freight_value) \
+                VALUES (%s, %s, %s, %s, %s, %s, %s)"
+
+
+        if count < 200:
+            CURSOR.execute(sql_insert_statement, 
+                            (order_id, product_id, order_item_id, 
+                                seller_id, shipping_limit_date, price, freight_value))
+            CONN.commit()
+            count += 1 
+
+
+        else:
+            sys.exit()
+
+
+order_item_table_insert_statement_task = PythonOperator(
+                                        task_id="order_item_table_insert_statement",
+                                        python_callable=order_item_table_insert_statement,
+                                        dag=insert_db_dag
+                                    )
+
+
+def order_review_table_insert_statement(): 
+    df = pd.read_csv("/home/airflow/gcs/data/olist_order_dataset.csv")
+
+    count = 0 
+    for indx, row in df.iterrows():
+        order_id = row['order_id']
+        review_id = row['review_id']
+        review_score = row['review_score']
+        review_comment_title = row['review_comment_title']
+        review_comment_message = row['review_comment_message']
+        review_creation_date = row['review_creation_date']
+        review_answer_timestamp = row['review_answer_timestamp']
+
+        sql_insert_statement = "INSERT INTO demo.product (order_id, review_id, \
+                review_score, review_comment_title, review_comment_message, \
+                review_creation_date, review_answer_timestamp) \
+                VALUES (%s, %s, %s, %s, %s, %s, %s)"
+
+
+        if count < 200:
+            CURSOR.execute(sql_insert_statement, 
+                            (order_id, review_id, review_score, review_comment_title,
+                                review_comment_message, review_creation_date, review_answer_timestamp))
+            CONN.commit()
+            count += 1 
+
+
+        else:
+            sys.exit()
+
+
+order_review_table_insert_statement_task = PythonOperator(
+                                        task_id="order_review_table_insert_statement",
+                                        python_callable=order_review_table_insert_statement,
+                                        dag=insert_db_dag
+                                    )
+
+
+def order_payment_table_insert_statement(): 
+    df = pd.read_csv("/home/airflow/gcs/data/olist_order_dataset.csv")
+
+    count = 0 
+    for indx, row in df.iterrows():
+        order_id = row['order_id']
+        payment_sequential = row['payment_sequential']
+        payment_type = row['payment_type']
+        payment_installments = row['payment_installments']
+        payment_value = row['payment_value']
+
+        sql_insert_statement = "INSERT INTO demo.product (order_id, payment_sequential, \
+                review_score, payment_installments, payment_value, payment_type) \
+                VALUES (%s, %s, %s, %s, %s)"
+
+
+        if count < 200:
+            CURSOR.execute(sql_insert_statement, 
+                            (order_id, payment_sequential, payment_type, payment_installments, payment_value))
+            CONN.commit()
+            count += 1 
+
+
+        else:
+            sys.exit()
+
+
+order_payment_table_insert_statement_task = PythonOperator(
+                                        task_id="order_payment_table_insert_statement",
+                                        python_callable=order_review_table_insert_statement,
+                                        dag=insert_db_dag
+                                    )
+
+
+
+    [customer_table_insert_statement_task, seller_table_insert_statement_task, geolocation_table_insert_statement_task, product_table_insert_statement_task] >> order_table_insert_statement_task /
+    [order_review_table_insert_statement, order_payment_table_insert_statement, order_item_table_insert_statementer]
