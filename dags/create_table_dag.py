@@ -22,7 +22,7 @@ default_args = { 'owner': 'shilu',
 
 
 with DAG(
-  dag_id='mysql_table_creation_dag',
+  dag_id='mysql_table_creation',
     default_args=default_args,
     # schedule_interval='0 0 * * *',
     schedule_interval='@once',
@@ -33,7 +33,7 @@ with DAG(
     
 
 
-    customer_createT_sql_statement = """ CREATE TABLE demo.customer(customer_id VARCHAR(255) PRIMARY KEY, 
+    customer_createT_sql_statement = """ CREATE TABLE hdfs_project_data.customer(customer_id VARCHAR(255) PRIMARY KEY, 
                                         customer_unique_id VARCHAR(255) NOT NULL, 
                                         customer_zip_code_prefix INT NOT NULL,
                                         customer_city CHAR(255) NOT NULL, 
@@ -44,7 +44,7 @@ with DAG(
                     mysql_conn_id="mysql_conn")
 
 
-    seller_createT_sql_statement = """ CREATE TABLE demo.seller(seller_id VARCHAR(255) PRIMARY KEY, 
+    seller_createT_sql_statement = """ CREATE TABLE hdfs_project_data.seller(seller_id VARCHAR(255) PRIMARY KEY, 
                                       seller_zip_code_prefix INT NOT NULL,
                                       seller_city CHAR(255) NOT NULL,
                                       seller_state CHAR(255) NOT NULL); """
@@ -54,7 +54,7 @@ with DAG(
                     mysql_conn_id="mysql_conn",)
 
 
-    products_createT_sql_statement = """ CREATE TABLE demo.product(product_id VARCHAR(255) PRIMARY KEY, 
+    products_createT_sql_statement = """ CREATE TABLE hdfs_project_data.product(product_id VARCHAR(255) PRIMARY KEY, 
                                       product_category_name CHAR(255) NOT NULL,
                                       product_name_length FLOAT,
                                       product_description_lenght FLOAT, 
@@ -69,7 +69,7 @@ with DAG(
                     mysql_conn_id="mysql_conn",)
 
 
-    geolocation_createT_sql_statement = """ CREATE TABLE demo.geolocation(geolocation_zip_code_prefix INT NOT NULL,
+    geolocation_createT_sql_statement = """ CREATE TABLE hdfs_project_data.geolocation(geolocation_zip_code_prefix INT NOT NULL,
                                       geolocation_lat FLOAT NOT NULL,
                                       geolocation_lng FLOAT NOT NULL, 
                                       geolocation_city CHAR(100) NOT NULL, 
@@ -80,7 +80,7 @@ with DAG(
                     mysql_conn_id="mysql_conn",)
 
 
-    orders_createT_sql_statement = """ CREATE TABLE demo.orders(order_id VARCHAR(30) PRIMARY KEY, 
+    orders_createT_sql_statement = """ CREATE TABLE hdfs_project_data.orders(order_id VARCHAR(255) PRIMARY KEY, 
                                       customer_id VARCHAR(100) NOT NULL,
                                       order_status CHAR(30) NOT NULL,
                                       order_purchase_timestamp CHAR(30), 
@@ -97,7 +97,7 @@ with DAG(
                     mysql_conn_id="mysql_conn",)
 
 
-    orders_item_createT_sql_statement = """ CREATE TABLE demo.order_item(order_id VARCHAR(255) NOT NULL, 
+    orders_item_createT_sql_statement = """ CREATE TABLE hdfs_project_data.order_item(order_id VARCHAR(255) NOT NULL, 
                                       product_id VARCHAR(255) NOT NULL,
                                       order_item_id INT NOT NULL,
                                       seller_id VARCHAR(100) NOT NULL, 
@@ -121,7 +121,7 @@ with DAG(
                     mysql_conn_id="mysql_conn", )
 
 
-    orders_payment_createT_sql_statement = """ CREATE TABLE demo.order_payment(order_id VARCHAR(100) NOT NULL, 
+    orders_payment_createT_sql_statement = """ CREATE TABLE hdfs_project_data.order_payment(order_id VARCHAR(100) NOT NULL, 
                                       payment_sequential INT NOT NULL,
                                       payment_type CHAR(20) NOT NULL,
                                       payment_installments INT NOT NULL, 
@@ -137,7 +137,7 @@ with DAG(
                     mysql_conn_id="mysql_conn", )
 
 
-    orders_review_createT_sql_statement = """ CREATE TABLE demo.order_review(order_id VARCHAR(100) NOT NULL, 
+    orders_review_createT_sql_statement = """ CREATE TABLE hdfs_project_data.order_review(order_id VARCHAR(100) NOT NULL, 
                                       review_id VARCHAR(100) NOT NULL,
                                       review_score INT,
                                       review_comment_title CHAR(10), 

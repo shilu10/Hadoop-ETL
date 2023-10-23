@@ -1,5 +1,7 @@
 from airflow.decorators import dag
 from datetime import datetime
+from datetime import timedelta
+from airflow import DAG
 from airflow.providers.ssh.operators.ssh import SSHOperator
 from airflow.operators.mysql_operator import MySqlOperator
 from airflow.utils.dates import days_ago
@@ -9,11 +11,15 @@ import mysql.connector
 import sys 
 import pandas as pd 
 import numpy as np 
+import os 
 
 
-CONN = mysql.connector.connect(host="35.202.49.158", 
-                              username="root", 
-                              password="shilu1234"
+
+
+
+CONN = mysql.connector.connect(host=os.environ['MYSQL_HOST'], 
+                              username=os.environ['MYSQL_USERNAME'], 
+                              password=os.environ['MYSQL_PASSWORD']
                             )
 
 CURSOR = CONN.cursor()
@@ -34,8 +40,8 @@ default_args = { 'owner': 'shilu',
 
 
 insert_db_dag = DAG(
-    dag_id='insertdb_dag',
-    default_args=args,
+    dag_id='insert_into_hdfs_project_db',
+    default_args=default_args,
     # schedule_interval='0 0 * * *',
     schedule_interval='@once',
     start_date=days_ago(1),
@@ -49,26 +55,39 @@ def customer_table_insert_statement():
 
     count = 0 
     for indx, row in df.iterrows():
-        customer_id = row['customer_id']
-        customer_unique_id = row['customer_unique_id']
-        customer_zip_code_prefix = row['customer_zip_code_prefix']
-        customer_city = row['customer_city']
-        customer_state = row['customer_state']
+        try:
+            customer_id = row['customer_id']
+            customer_unique_id = row['customer_unique_id']
+            customer_zip_code_prefix = row['customer_zip_code_prefix']
+            customer_city = row['customer_city']
+            customer_state = row['customer_state']
 
-        sql_insert_statement = "INSERT INTO demo.customer (customer_id, customer_unique_id, \
-                customer_zip_code_prefix, customer_city, customer_state) VALUES (%s, %s, %s, %s, %s)"
+            # Check if the record already exists
+            sql_check_statement = "SELECT * FROM hdfs_project_data.customer WHERE customer_id = %s"
+            CURSOR.execute(sql_check_statement, (customer_id,))
+
+            if CURSOR.fetchone():
+                print("record already exists")
+
+            else:
+
+                sql_insert_statement = "INSERT INTO hdfs_project_data.customer (customer_id, customer_unique_id, \
+                        customer_zip_code_prefix, customer_city, customer_state) VALUES (%s, %s, %s, %s, %s)"
 
 
-        if count < 200:
-            CURSOR.execute(sql_insert_statement, 
-                            (customer_id, customer_unique_id, 
-                                customer_zip_code_prefix, customer_city, customer_state))
-            CONN.commit()
-            count += 1 
+                if count < 200:
+                    CURSOR.execute(sql_insert_statement, 
+                                    (customer_id, customer_unique_id, 
+                                        customer_zip_code_prefix, customer_city, customer_state))
+                    CONN.commit()
+                    count += 1 
 
 
-        else:
-            sys.exit()
+                else:
+                    return
+
+        except Exception as err:
+            print(err, "err")
 
 
 customer_table_insert_statement_task = PythonOperator(
@@ -79,7 +98,7 @@ customer_table_insert_statement_task = PythonOperator(
 
 
 def seller_table_insert_statement(): 
-    df = pd.read_csv("/home/airflow/gcs/data/olist_seller_dataset.csv")
+    df = pd.read_csv("/home/airflow/gcs/data/olist_sellers_dataset.csv")
 
     count = 0 
     for indx, row in df.iterrows():
@@ -88,20 +107,29 @@ def seller_table_insert_statement():
         seller_city = row['seller_city']
         seller_state = row['seller_state']
 
-        sql_insert_statement = "INSERT INTO demo.seller (seller_id, seller_zip_code_prefix, \
-                seller_city, seller_state) VALUES (%s, %s, %s, %s)"
+        # Check if the record already exists
+        sql_check_statement = "SELECT * FROM hdfs_project_data.seller WHERE seller_id = %s"
+        CURSOR.execute(sql_check_statement, (seller_id,))
 
-
-        if count < 200:
-            CURSOR.execute(sql_insert_statement, 
-                            (seller_id, seller_zip_code_prefix, 
-                                seller_city, seller_state))
-            CONN.commit()
-            count += 1 
-
+        if CURSOR.fetchone():
+            print("record already exists")
 
         else:
-            sys.exit()
+
+            sql_insert_statement = "INSERT INTO hdfs_project_data.seller (seller_id, seller_zip_code_prefix, \
+                    seller_city, seller_state) VALUES (%s, %s, %s, %s)"
+
+
+            if count < 200:
+                CURSOR.execute(sql_insert_statement, 
+                                (seller_id, seller_zip_code_prefix, 
+                                    seller_city, seller_state))
+                CONN.commit()
+                count += 1 
+
+
+            else:
+                return
 
 
 seller_table_insert_statement_task = PythonOperator(
@@ -122,7 +150,9 @@ def geolocation_table_insert_statement():
         geolocation_city = row['geolocation_city']
         geolocation_state = row['geolocation_state']
 
-        sql_insert_statement = "INSERT INTO demo.geolocation (geolocation_zip_code_prefix, geolocation_lat, \
+
+
+        sql_insert_statement = "INSERT INTO hdfs_project_data.geolocation (geolocation_zip_code_prefix, geolocation_lat, \
                 geolocation_lng, geolocation_city, geolocation_state) VALUES (%s, %s, %s, %s, %s)"
 
 
@@ -135,7 +165,7 @@ def geolocation_table_insert_statement():
 
 
         else:
-            sys.exit()
+            return
 
 
 geolocation_table_insert_statement_task = PythonOperator(
@@ -146,13 +176,13 @@ geolocation_table_insert_statement_task = PythonOperator(
 
 
 def product_table_insert_statement(): 
-    df = pd.read_csv("/home/airflow/gcs/data/olist_product_dataset.csv")
+    df = pd.read_csv("/home/airflow/gcs/data/olist_products_dataset.csv")
 
     count = 0 
     for indx, row in df.iterrows():
         product_id = row['product_id']
         product_category_name = row['product_category_name']
-        product_name_length = row['product_name_length']
+        product_name_length = row['product_name_lenght']
         product_description_lenght = row['product_description_lenght']
         product_photos_qty = row['product_photos_qty']
         product_weight_g = row['product_weight_g']
@@ -160,23 +190,31 @@ def product_table_insert_statement():
         product_height_cm = row['product_height_cm']
         product_width_cm = row['product_width_cm']
 
-        sql_insert_statement = "INSERT INTO demo.product (product_id, product_category_name, \
-                product_name_length, product_description_lenght, product_photos_qty, \
-                product_weight_g, product_length_cm, product_height_cm, product_width_cm) \
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        # Check if the record already exists
+        sql_check_statement = "SELECT * FROM hdfs_project_data.product WHERE product_id = %s"
+        CURSOR.execute(sql_check_statement, (product_id,))
 
-
-        if count < 200:
-            CURSOR.execute(sql_insert_statement, 
-                            (product_id, product_category_name, product_name_length, 
-                                product_description_lenght, product_photos_qty, product_weight_g, 
-                                product_length_cm, product_height_cm, product_width_cm))
-            CONN.commit()
-            count += 1 
-
+        if CURSOR.fetchone():
+            print("record already exists")
 
         else:
-            sys.exit()
+            sql_insert_statement = "INSERT INTO hdfs_project_data.product (product_id, product_category_name, \
+                    product_name_length, product_description_lenght, product_photos_qty, \
+                    product_weight_g, product_length_cm, product_height_cm, product_width_cm) \
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+
+
+            if count < 200:
+                CURSOR.execute(sql_insert_statement, 
+                                (product_id, product_category_name, product_name_length, 
+                                    product_description_lenght, product_photos_qty, product_weight_g, 
+                                    product_length_cm, product_height_cm, product_width_cm))
+                CONN.commit()
+                count += 1 
+
+
+            else:
+                return
 
 
 product_table_insert_statement_task = PythonOperator(
@@ -187,7 +225,7 @@ product_table_insert_statement_task = PythonOperator(
 
 
 def order_table_insert_statement(): 
-    df = pd.read_csv("/home/airflow/gcs/data/olist_order_dataset.csv")
+    df = pd.read_csv("/home/airflow/gcs/data/olist_orders_dataset.csv")
 
     count = 0 
     for indx, row in df.iterrows():
@@ -200,23 +238,31 @@ def order_table_insert_statement():
         order_delivered_customer_date = row['order_delivered_customer_date']
         order_estimated_delivery_date = row['order_estimated_delivery_date']
 
-        sql_insert_statement = "INSERT INTO demo.product (order_id, customer_id, \
-                order_status, order_purchase_timestamp, order_approved_at, \
-                order_delivered_carrier_date, order_delivered_customer_date, order_estimated_delivery_date) \
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        # Check if the record already exists
+        sql_check_statement = "SELECT * FROM hdfs_project_data.orders WHERE order_id = %s"
+        CURSOR.execute(sql_check_statement, (order_id,))
 
-
-        if count < 200:
-            CURSOR.execute(sql_insert_statement, 
-                            (order_id, customer_id, order_status, 
-                                order_purchase_timestamp, order_approved_at, order_delivered_carrier_date, 
-                                order_delivered_customer_date, order_estimated_delivery_date))
-            CONN.commit()
-            count += 1 
-
+        if CURSOR.fetchone():
+            print("record already exists")
 
         else:
-            sys.exit()
+            sql_insert_statement = "INSERT INTO hdfs_project_data.orders (order_id, customer_id, \
+                    order_status, order_purchase_timestamp, order_approved_at, \
+                    order_delivered_carrier_date, order_delivered_customer_date, order_estimated_delivery_date) \
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+
+
+            if count < 200:
+                CURSOR.execute(sql_insert_statement, 
+                                (order_id, customer_id, order_status, 
+                                    order_purchase_timestamp, order_approved_at, order_delivered_carrier_date, 
+                                    order_delivered_customer_date, order_estimated_delivery_date))
+                CONN.commit()
+                count += 1 
+
+
+            else:
+                return
 
 
 order_table_insert_statement_task = PythonOperator(
@@ -227,7 +273,7 @@ order_table_insert_statement_task = PythonOperator(
 
 
 def order_item_table_insert_statement(): 
-    df = pd.read_csv("/home/airflow/gcs/data/olist_order_dataset.csv")
+    df = pd.read_csv("/home/airflow/gcs/data/olist_order_items_dataset.csv")
 
     count = 0 
     for indx, row in df.iterrows():
@@ -239,7 +285,7 @@ def order_item_table_insert_statement():
         price = row['price']
         freight_value = row['freight_value']
 
-        sql_insert_statement = "INSERT INTO demo.product (order_id, product_id, \
+        sql_insert_statement = "INSERT INTO hdfs_project_data.order_item (order_id, product_id, \
                 order_item_id, seller_id, shipping_limit_date, price, freight_value) \
                 VALUES (%s, %s, %s, %s, %s, %s, %s)"
 
@@ -253,7 +299,7 @@ def order_item_table_insert_statement():
 
 
         else:
-            sys.exit()
+            return
 
 
 order_item_table_insert_statement_task = PythonOperator(
@@ -264,7 +310,7 @@ order_item_table_insert_statement_task = PythonOperator(
 
 
 def order_review_table_insert_statement(): 
-    df = pd.read_csv("/home/airflow/gcs/data/olist_order_dataset.csv")
+    df = pd.read_csv("/home/airflow/gcs/data/olist_order_reviews_dataset.csv")
 
     count = 0 
     for indx, row in df.iterrows():
@@ -276,22 +322,31 @@ def order_review_table_insert_statement():
         review_creation_date = row['review_creation_date']
         review_answer_timestamp = row['review_answer_timestamp']
 
-        sql_insert_statement = "INSERT INTO demo.product (order_id, review_id, \
-                review_score, review_comment_title, review_comment_message, \
-                review_creation_date, review_answer_timestamp) \
-                VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        # Check if the record already exists
+        sql_check_statement = "SELECT * FROM hdfs_project_data.order_review WHERE review_id = %s"
+        CURSOR.execute(sql_check_statement, (review_id,))
 
-
-        if count < 200:
-            CURSOR.execute(sql_insert_statement, 
-                            (order_id, review_id, review_score, review_comment_title,
-                                review_comment_message, review_creation_date, review_answer_timestamp))
-            CONN.commit()
-            count += 1 
-
+        if CURSOR.fetchone():
+            print("record already exists")
 
         else:
-            sys.exit()
+
+            sql_insert_statement = "INSERT INTO hdfs_project_data.order_review (order_id, review_id, \
+                    review_score, review_comment_title, review_comment_message, \
+                    review_creation_date, review_answer_timestamp) \
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)"
+
+
+            if count < 200:
+                CURSOR.execute(sql_insert_statement, 
+                                (order_id, review_id, review_score, review_comment_title,
+                                    review_comment_message, review_creation_date, review_answer_timestamp))
+                CONN.commit()
+                count += 1 
+
+
+            else:
+                return
 
 
 order_review_table_insert_statement_task = PythonOperator(
@@ -302,7 +357,7 @@ order_review_table_insert_statement_task = PythonOperator(
 
 
 def order_payment_table_insert_statement(): 
-    df = pd.read_csv("/home/airflow/gcs/data/olist_order_dataset.csv")
+    df = pd.read_csv("/home/airflow/gcs/data/olist_order_payments_dataset.csv")
 
     count = 0 
     for indx, row in df.iterrows():
@@ -312,29 +367,36 @@ def order_payment_table_insert_statement():
         payment_installments = row['payment_installments']
         payment_value = row['payment_value']
 
-        sql_insert_statement = "INSERT INTO demo.product (order_id, payment_sequential, \
-                review_score, payment_installments, payment_value, payment_type) \
-                VALUES (%s, %s, %s, %s, %s)"
+        # Check if the record already exists
+        sql_check_statement = "SELECT * FROM hdfs_project_data.order_payment WHERE payment_sequential = %s"
+        CURSOR.execute(sql_check_statement, (payment_sequential,))
 
-
-        if count < 200:
-            CURSOR.execute(sql_insert_statement, 
-                            (order_id, payment_sequential, payment_type, payment_installments, payment_value))
-            CONN.commit()
-            count += 1 
-
+        if CURSOR.fetchone():
+            print("record already exists")
 
         else:
-            sys.exit()
+            sql_insert_statement = "INSERT INTO hdfs_project_data.order_payment (order_id, payment_sequential, \
+                    review_score, payment_installments, payment_value, payment_type) \
+                    VALUES (%s, %s, %s, %s, %s)"
+
+
+            if count < 200:
+                CURSOR.execute(sql_insert_statement, 
+                                (order_id, payment_sequential, payment_type, payment_installments, payment_value))
+                CONN.commit()
+                count += 1 
+
+
+            else:
+                return 
 
 
 order_payment_table_insert_statement_task = PythonOperator(
                                         task_id="order_payment_table_insert_statement",
-                                        python_callable=order_review_table_insert_statement,
+                                        python_callable=order_payment_table_insert_statement,
                                         dag=insert_db_dag
                                     )
 
 
 
-    [customer_table_insert_statement_task, seller_table_insert_statement_task, geolocation_table_insert_statement_task, product_table_insert_statement_task] >> order_table_insert_statement_task /
-    [order_review_table_insert_statement, order_payment_table_insert_statement, order_item_table_insert_statementer]
+[customer_table_insert_statement_task, seller_table_insert_statement_task, geolocation_table_insert_statement_task, product_table_insert_statement_task] >> order_table_insert_statement_task >> [order_review_table_insert_statement_task, order_payment_table_insert_statement_task, order_item_table_insert_statement_task]
