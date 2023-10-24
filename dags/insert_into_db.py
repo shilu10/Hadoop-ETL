@@ -30,7 +30,7 @@ default_args = { 'owner': 'shilu',
 
 
 insert_db_dag = DAG(
-    dag_id='insert_into_hdfs_project_db',
+    dag_id='insert_into_hdfs_project_db_2',
     default_args=default_args,
     # schedule_interval='0 0 * * *',
     schedule_interval='@once',
@@ -60,9 +60,9 @@ def customer_table_insert_statement():
             customer_state = row['customer_state']
 
             last_value_statement = "SELECT id from hdfs_project_data.customer ORDER BY id DESC LIMIT 1"
-            cursor.execute(sql_check_statement, last_value_statement)
-            last_value = cursor.fetchone()[0]
-            id = last_value + 1 if last_value else 0
+            cursor.execute(last_value_statement)
+            last_value = cursor.fetchone()
+            id = last_value[0] + 1 if last_value else 0
 
             # Check if the record already exists
             sql_check_statement = "SELECT * FROM hdfs_project_data.customer WHERE customer_id = %s"
@@ -70,6 +70,7 @@ def customer_table_insert_statement():
 
             if cursor.fetchone():
                 print("record already exists")
+                count += 1 
 
             else:
 
@@ -118,9 +119,9 @@ def seller_table_insert_statement():
         seller_state = row['seller_state']
 
         last_value_statement = "SELECT id from hdfs_project_data.seller ORDER BY id DESC LIMIT 1"
-        cursor.execute(sql_check_statement, last_value_statement)
-        last_value = cursor.fetchone()[0]
-        id = last_value + 1 if last_value else 0
+        cursor.execute(last_value_statement)
+        last_value = cursor.fetchone()
+        id = last_value[0] + 1 if last_value else 0
 
         # Check if the record already exists
         sql_check_statement = "SELECT * FROM hdfs_project_data.seller WHERE seller_id = %s"
@@ -174,9 +175,9 @@ def geolocation_table_insert_statement():
         geolocation_state = row['geolocation_state']
 
         last_value_statement = "SELECT id from hdfs_project_data.geolocation ORDER BY id DESC LIMIT 1"
-        cursor.execute(sql_check_statement, last_value_statement)
-        last_value = cursor.fetchone()[0]
-        id = last_value + 1 if last_value else 0
+        cursor.execute(last_value_statement)
+        last_value = cursor.fetchone()
+        id = last_value[0] + 1 if last_value else 0
 
         sql_insert_statement = "INSERT INTO hdfs_project_data.geolocation (id, geolocation_zip_code_prefix, geolocation_lat, \
                 geolocation_lng, geolocation_city, geolocation_state) VALUES (%s, %s, %s, %s, %s, %s)"
@@ -225,9 +226,9 @@ def product_table_insert_statement():
         product_width_cm = row['product_width_cm']
 
         last_value_statement = "SELECT id from hdfs_project_data.product ORDER BY id DESC LIMIT 1"
-        cursor.execute(sql_check_statement, last_value_statement)
-        last_value = cursor.fetchone()[0]
-        id = last_value + 1 if last_value else 0
+        cursor.execute(last_value_statement)
+        last_value = cursor.fetchone()
+        id = last_value[0] + 1 if last_value else 0
 
         # Check if the record already exists
         sql_check_statement = "SELECT * FROM hdfs_project_data.product WHERE product_id = %s"
@@ -286,9 +287,9 @@ def order_table_insert_statement():
         order_estimated_delivery_date = row['order_estimated_delivery_date']
 
         last_value_statement = "SELECT id from hdfs_project_data.orders ORDER BY id DESC LIMIT 1"
-        cursor.execute(sql_check_statement, last_value_statement)
-        last_value = cursor.fetchone()[0]
-        id = last_value + 1 if last_value else 0
+        cursor.execute(last_value_statement)
+        last_value = cursor.fetchone()
+        id = last_value[0] + 1 if last_value else 0
 
         # Check if the record already exists
         sql_check_statement = "SELECT * FROM hdfs_project_data.orders WHERE order_id = %s"
@@ -346,9 +347,9 @@ def order_item_table_insert_statement():
         freight_value = row['freight_value']
 
         last_value_statement = "SELECT id from hdfs_project_data.order_item ORDER BY id DESC LIMIT 1"
-        cursor.execute(sql_check_statement, last_value_statement)
-        last_value = cursor.fetchone()[0]
-        id = last_value + 1 if last_value else 0
+        cursor.execute(last_value_statement)
+        last_value = cursor.fetchone()
+        id = last_value[0] + 1 if last_value else 0
 
         sql_insert_statement = "INSERT INTO hdfs_project_data.order_item (id, order_id, product_id, \
                 order_item_id, seller_id, shipping_limit_date, price, freight_value) \
@@ -396,9 +397,9 @@ def order_review_table_insert_statement():
         review_answer_timestamp = row['review_answer_timestamp']
 
         last_value_statement = "SELECT id from hdfs_project_data.order_review ORDER BY id DESC LIMIT 1"
-        cursor.execute(sql_check_statement, last_value_statement)
-        last_value = cursor.fetchone()[0]
-        id = last_value + 1 if last_value else 0
+        cursor.execute(last_value_statement)
+        last_value = cursor.fetchone()
+        id = last_value[0] + 1 if last_value else 0
 
         # Check if the record already exists
         sql_check_statement = "SELECT * FROM hdfs_project_data.order_review WHERE review_id = %s"
@@ -417,7 +418,7 @@ def order_review_table_insert_statement():
 
             if count < 200:
                 cursor.execute(sql_insert_statement, 
-                                (order_id, review_id, review_score, review_comment_title,
+                                (id, order_id, review_id, review_score, review_comment_title,
                                     review_comment_message, review_creation_date, review_answer_timestamp))
                 
                 connection.commit()
@@ -435,6 +436,7 @@ order_review_table_insert_statement_task = PythonOperator(
                                     )
 
 
+## not working as excpeted
 def order_payment_table_insert_statement(): 
     df = pd.read_csv("/home/airflow/gcs/data/olist_order_payments_dataset.csv")
 
@@ -454,9 +456,9 @@ def order_payment_table_insert_statement():
         payment_value = row['payment_value']
 
         last_value_statement = "SELECT id from hdfs_project_data.order_payment ORDER BY id DESC LIMIT 1"
-        cursor.execute(sql_check_statement, last_value_statement)
-        last_value = cursor.fetchone()[0]
-        id = last_value + 1 if last_value else 0
+        cursor.execute(last_value_statement)
+        last_value = cursor.fetchone()
+        id = last_value[0] + 1 if last_value else 0
 
         # Check if the record already exists
         sql_check_statement = "SELECT * FROM hdfs_project_data.order_payment WHERE payment_sequential = %s"
@@ -475,7 +477,7 @@ def order_payment_table_insert_statement():
                 cursor.execute(sql_insert_statement, 
                                 (id, order_id, payment_sequential, 
                                     payment_type, payment_installments, payment_value))
-                
+
                 connection.commit()
                 count += 1 
                 connection.close()
