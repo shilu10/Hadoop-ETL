@@ -11,5 +11,4 @@ terraform {
 provider "google" {
   project     = "decent-atlas-356812"
   region      = "us-central1"
-  credentials = file("keys.json")
 }
