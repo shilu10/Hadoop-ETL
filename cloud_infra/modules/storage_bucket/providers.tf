@@ -9,6 +9,7 @@ terraform {
 
 
 provider "google" {
-  project     = "enduring-fold-402203"
+  project     = "decent-atlas-356812"
   region      = "us-central1"
+  credentials = file("keys.json")
 }
