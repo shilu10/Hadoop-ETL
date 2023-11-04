@@ -4,9 +4,9 @@ data "google_service_account" "this" {
         account_id = "terraformserviceaccount@decent-atlas-356812.iam.gserviceaccount.com"
 }
 
-resource "google_dataproc_cluster" "mycluster" {
-  name     = "devdemo"
-  region   = "us-central1"
+resource "google_dataproc_cluster" "this" {
+  name     = var.name
+  region   = var.region
   graceful_decommission_timeout = "120s"
   labels = {
     foo = "bar"
@@ -14,14 +14,14 @@ resource "google_dataproc_cluster" "mycluster" {
 
   cluster_config {
   	endpoint_config {
-    	enable_http_port_access = "true"
+    	enable_http_port_access = var.enable_http_port_access
   	}
     
-    staging_bucket = "djkfsdhjvdfhdl"
+    staging_bucket = var.staging_bucket
 
     master_config {
-      num_instances = 1
-      machine_type  = "n1-standard-2"
+      num_instances = var.num_master
+      machine_type  = var.master_machine_type 
       disk_config {
         boot_disk_type    = "pd-ssd"
         boot_disk_size_gb = 30
@@ -29,8 +29,8 @@ resource "google_dataproc_cluster" "mycluster" {
     }
 
     worker_config {
-      num_instances    = 2
-      machine_type     = "n1-standard-2"
+      num_instances    = var.num_worker
+      machine_type     = var.worker_machine_type 
       min_cpu_platform = "Intel Skylake"
       disk_config {
         boot_disk_size_gb = 30
@@ -53,7 +53,7 @@ resource "google_dataproc_cluster" "mycluster" {
     gce_cluster_config {
       tags = ["foo", "bar"]
       # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
-      service_account = data.google_service_account.this.email
+      service_account = google_service_account.this.email
       service_account_scopes = [
         "cloud-platform"
       ]
@@ -70,4 +70,15 @@ resource "google_dataproc_cluster" "mycluster" {
       timeout_sec = 500
     }
   }
+}
+
+resource "google_service_account" "this" {
+  account_id   = "dataproc-env-account"
+  display_name = "Test Service Account for Dataproc Environment"
+}
+
+resource "google_project_iam_member" "this" {
+  role   = "roles/dataproc.admin"
+  member = "serviceAccount:${google_service_account.this.email}"
+  project     = "decent-atlas-356812"
 }

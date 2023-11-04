@@ -1,47 +1,46 @@
-resource "google_composer_environment" "test" {
-  name   = "example-composer-env"
-  region = "us-central1"
+
+resource "google_composer_environment" "this" {
+  name   = var.composer_name
+  region = var.region
+
   config {
-    node_count = 4
+    node_count = var.node_count
 
     node_config {
-      zone         = "us-central1-a"
-      machine_type = "n1-standard-1"
-
-      network    = google_compute_network.test.id
-      subnetwork = google_compute_subnetwork.test.id
-
-      service_account = google_service_account.test.name
+      zone            = var.zone
+      machine_type    = var.machine_type
+      network         = "default"
+      subnetwork      = "default"
+      service_account = google_service_account.this.name
     }
 
-    database_config {
-      machine_type = "db-n1-standard-2"
-    }
+    software_config {
+      image_version = var.composer_image_version
+      python_version = var.python_version
+      airflow_config_overrides = {
+        core-load_example = "True"
+        core-dags_are_paused_at_creation = "True"
+      }
 
-    web_server_config {
-      machine_type = "composer-n1-webserver-2"
+      pypi_packages = {
+        numpy = "==1.14.0"
+        pandas = "==0.22.0"
+      }
+
+      env_variables = {
+        FOO = "bar"
+      }
     }
   }
 }
 
-resource "google_compute_network" "test" {
-  name                    = "composer-test-network"
-  auto_create_subnetworks = false
-}
-
-resource "google_compute_subnetwork" "test" {
-  name          = "composer-test-subnetwork"
-  ip_cidr_range = "10.2.0.0/16"
-  region        = "us-central1"
-  network       = google_compute_network.test.id
-}
-
-resource "google_service_account" "test" {
+resource "google_service_account" "this" {
   account_id   = "composer-env-account"
   display_name = "Test Service Account for Composer Environment"
 }
 
-resource "google_project_iam_member" "composer-worker" {
+resource "google_project_iam_member" "this" {
   role   = "roles/composer.worker"
-  member = "serviceAccount:${google_service_account.test.email}"
+  member = "serviceAccount:${google_service_account.this.email}"
+  project     = "decent-atlas-356812"
 }
