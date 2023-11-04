@@ -70,6 +70,12 @@ resource "google_dataproc_cluster" "this" {
       timeout_sec = 500
     }
   }
+
+  depends_on = [
+
+      google_service_account.this,
+      google_project_iam_member.admin
+    ]
 }
 
 resource "google_service_account" "this" {
@@ -77,8 +83,20 @@ resource "google_service_account" "this" {
   display_name = "Test Service Account for Dataproc Environment"
 }
 
-resource "google_project_iam_member" "this" {
+resource "google_project_iam_member" "admin" {
   role   = "roles/dataproc.admin"
+  member = "serviceAccount:${google_service_account.this.email}"
+  project     = "decent-atlas-356812"
+}
+
+resource "google_project_iam_member" "worker" {
+  role   = "roles/dataproc.worker"
+  member = "serviceAccount:${google_service_account.this.email}"
+  project     = "decent-atlas-356812"
+}
+
+resource "google_project_iam_member" "compute" {
+  role   = "roles/compute.admin"
   member = "serviceAccount:${google_service_account.this.email}"
   project     = "decent-atlas-356812"
 }
