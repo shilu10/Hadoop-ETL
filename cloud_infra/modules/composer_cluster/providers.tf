@@ -8,7 +8,7 @@ terraform {
 }
 
 
-provider "google" {
-  project     = "decent-atlas-356812"
-  region      = "us-central1"
+provider "google-beta" {
+  project = "decent-atlas-356812"
+  region  = "us-central1"
 }
