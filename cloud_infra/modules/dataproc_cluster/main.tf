@@ -1,7 +1,7 @@
 
 ## dataproc cluster
 data "google_service_account" "this" {
-        account_id = "5005838637-compute@developer.gserviceaccount.com"
+        account_id = "terraformserviceaccount@decent-atlas-356812.iam.gserviceaccount.com"
 }
 
 resource "google_dataproc_cluster" "mycluster" {
@@ -17,11 +17,11 @@ resource "google_dataproc_cluster" "mycluster" {
     	enable_http_port_access = "true"
   	}
     
-    staging_bucket = "dataproc-bucket-demo111"
+    staging_bucket = "djkfsdhjvdfhdl"
 
     master_config {
       num_instances = 1
-      machine_type  = "n1-standard-4"
+      machine_type  = "n1-standard-2"
       disk_config {
         boot_disk_type    = "pd-ssd"
         boot_disk_size_gb = 30
@@ -30,7 +30,7 @@ resource "google_dataproc_cluster" "mycluster" {
 
     worker_config {
       num_instances    = 2
-      machine_type     = "n1-standard-4"
+      machine_type     = "n1-standard-2"
       min_cpu_platform = "Intel Skylake"
       disk_config {
         boot_disk_size_gb = 30
