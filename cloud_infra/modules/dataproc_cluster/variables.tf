@@ -13,12 +13,6 @@ variable "enable_http_port_access"{
 	default = "true"
 }
 
-
-variable "staging_bucket"{
-	type = string 
-	default = "djkfsdhjvdfhdl"
-}
-
 variable "num_master" {
 	type = number 
 	default = 1

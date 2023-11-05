@@ -22,6 +22,11 @@ resource "google_composer_environment" "this" {
         core-dags_are_paused_at_creation = "True"
       }
 
+      pypi_packages = {
+        numpy = "==1.14.0"
+        pandas = "==0.22.0"
+      }
+
       env_variables = {
         FOO = "bar"
       }

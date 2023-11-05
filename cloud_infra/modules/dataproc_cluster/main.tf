@@ -17,8 +17,6 @@ resource "google_dataproc_cluster" "this" {
     	enable_http_port_access = var.enable_http_port_access
   	}
     
-    staging_bucket = var.staging_bucket
-
     master_config {
       num_instances = var.num_master
       machine_type  = var.master_machine_type 

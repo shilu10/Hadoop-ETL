@@ -28,3 +28,10 @@ variable "composer_image_version"{
 	default = "composer-1.20.12-airflow-1.10.15"
 }
 
+variable "python_version"{
+	type = string 
+	default = "3"
+}
+
+
+
