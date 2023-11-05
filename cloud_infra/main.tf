@@ -60,15 +60,3 @@ resource "google_storage_bucket_object" "extra_file_directory" {
   content       = "Directory contains a python files"
   bucket        = module.storage_bucket.id
 }
-
-resource "null_resource" "upload_folder_content" {
-  provisioner "local-exec" {
-    command = "gsutil cp -r ${var.source_data_path} ${var.source_data_destination_path}"
-  }
-}
-
-resource "null_resource" "upload_folder_content_1" {
-  provisioner "local-exec" {
-    command = "gsutil cp -r ${var.script_data_path} ${var.script_data_destination_path}"
-  }
-}

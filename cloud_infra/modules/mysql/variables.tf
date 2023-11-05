@@ -1,11 +1,11 @@
 variable "database_name" {
 	type = string
-	default = "olist"
+	default = "demo"
 }
 
 variable "database_instance_name" {
 	type = string
-	default = "hdfs-project"
+	default = "demo"
 }
 
 variable "database_version" {
@@ -26,10 +26,10 @@ variable "tier" {
 variable "authorized_networks" {
     description = "A list of whitelisted IP addresses."
     type = list
-    default = ["0.0.0.0/0"]
+    default = []
 }
 
 variable "root_password" {
     type = string
-    default = "shilu1234"
+    default = "password"
 }
