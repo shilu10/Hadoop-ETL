@@ -1,11 +1,11 @@
 variable "db_name" {
 	type = string
-	default = "olist"
+	default = "demo"
 }
 
 variable "db_instance_name" {
 	type = string
-	default = "hdfs-project"
+	default = "demo"
 }
 
 variable "db_version" {
@@ -31,7 +31,7 @@ variable "db_authorized_networks" {
 
 variable "db_root_password" {
     type = string
-    default = "shilu1234"
+    default = "password"
 }
 
 
@@ -126,22 +126,3 @@ variable "bucket_storage_class" {
 	default = "STANDARD"
 }
 
-variable "source_data_path" {
-	type = string 
-	default = "./source_data/*"
-}
-
-variable "source_data_destination_path" {
-	type = string 
-	default = "gs://hdfs_project_data/source_data/"
-}
-
-variable "script_data_path" {
-	type = string 
-	default = "../../../src/*"
-}
-
-variable "script_data_destination_path" {
-	type = string 
-	default = "gs://hdfs_project_data/scripts/"
-}
