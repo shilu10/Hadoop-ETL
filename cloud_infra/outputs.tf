@@ -37,7 +37,7 @@ output "db_ip_addr" {
 }
 
 output "db_public_ip_addr" {
-	value = module.mysql.public_ip_address
+	value = module.mysql.db_public_ip_addr
 }
 
 output "id" {
