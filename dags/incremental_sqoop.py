@@ -23,7 +23,7 @@ default_args = { 'owner': 'shilu',
         }
 
 
-sshHook = SSHHook(ssh_conn_id='ssh_new1', cmd_timeout=None)
+sshHook = SSHHook(ssh_conn_id='ssh_new1', timeout=None)
 
 
 sqoop_dag = DAG(

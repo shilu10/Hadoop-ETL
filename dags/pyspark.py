@@ -175,7 +175,7 @@ order_pyspark_task = DataprocSubmitJobOperator(
 
 
 cust_pyspark_task >> geolocation_pyspark_task >> seller_pyspark_task >> /
- product_pyspark_task >> order_pyspark_task >> order_review_pyspark_task >> /
- order_payment_pyspark_task >> order_item_pyspark_task
+product_pyspark_task >> order_pyspark_task >> order_review_pyspark_task >> /
+order_payment_pyspark_task >> order_item_pyspark_task
 
 
