@@ -73,13 +73,13 @@ resource "null_resource" "run_python" {
   }
 }
 
-resource "null_resource" "run_python" {
+resource "null_resource" "run_python_1" {
   provisioner "local-exec" {
     command = "bash ../scripts/copy_to_source_bucket.sh"
   }
 }
 
-resource "null_resource" "run_python" {
+resource "null_resource" "run_python_2" {
   provisioner "local-exec" {
     command = "bash ../scripts/update_composer_cluster.sh"
   }
