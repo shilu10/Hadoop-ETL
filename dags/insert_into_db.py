@@ -78,13 +78,13 @@ def customer_table_insert_statement():
                         customer_zip_code_prefix, customer_city, customer_state) VALUES (%s, %s, %s, %s, %s, %s)"
 
 
-                if count < 200:
-                    cursor.execute(sql_insert_statement, 
+                
+                cursor.execute(sql_insert_statement, 
                                     (id, customer_id, customer_unique_id, 
                                         customer_zip_code_prefix, customer_city, customer_state))
-                    connection.commit()
-                    count += 1 
-                    connection.close()
+                connection.commit()
+                count += 1 
+                connection.close()
 
 
                 else:
@@ -136,13 +136,13 @@ def seller_table_insert_statement():
                     seller_city, seller_state) VALUES (%s, %s, %s, %s, %s)"
 
 
-            if count < 200:
-                cursor.execute(sql_insert_statement, 
+            
+            cursor.execute(sql_insert_statement, 
                                 (id, seller_id, seller_zip_code_prefix, 
                                     seller_city, seller_state))
-                connection.commit()
-                count += 1 
-                connection.close()
+            connection.commit()
+            count += 1 
+            connection.close()
 
 
             else:
@@ -183,13 +183,13 @@ def geolocation_table_insert_statement():
                 geolocation_lng, geolocation_city, geolocation_state) VALUES (%s, %s, %s, %s, %s, %s)"
 
 
-        if count < 200:
-            cursor.execute(sql_insert_statement, 
+        
+        cursor.execute(sql_insert_statement, 
                             (id, geolocation_zip_code_prefix, geolocation_lat, 
                                 geolocation_lng, geolocation_city, geolocation_state))
-            connection.commit()
-            count += 1 
-            connection.close()
+        connection.commit()
+        count += 1 
+        connection.close()
 
 
         else:
@@ -244,14 +244,14 @@ def product_table_insert_statement():
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
 
-            if count < 200:
-                cursor.execute(sql_insert_statement, 
+            
+            cursor.execute(sql_insert_statement, 
                                 (id, product_id, product_category_name, product_name_length, 
                                     product_description_lenght, product_photos_qty, product_weight_g, 
                                     product_length_cm, product_height_cm, product_width_cm))
-                connection.commit()
-                count += 1 
-                connection.close()
+            connection.commit()
+            count += 1 
+            connection.close()
 
 
             else:
@@ -305,14 +305,14 @@ def order_table_insert_statement():
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
 
-            if count < 200:
-                cursor.execute(sql_insert_statement, 
+           
+            cursor.execute(sql_insert_statement, 
                                 (id, order_id, customer_id, order_status, 
                                     order_purchase_timestamp, order_approved_at, order_delivered_carrier_date, 
                                     order_delivered_customer_date, order_estimated_delivery_date))
-                connection.commit()
-                count += 1 
-                connection.close()
+            connection.commit()
+            count += 1 
+            connection.close()
 
 
             else:
@@ -356,12 +356,12 @@ def order_item_table_insert_statement():
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
 
 
-        if count < 200:
-            cursor.execute(sql_insert_statement, 
+        
+        cursor.execute(sql_insert_statement, 
                             (id, order_id, product_id, order_item_id, 
                                 seller_id, shipping_limit_date, price, freight_value))
-            connection.commit()
-            count += 1 
+        connection.commit()
+        count += 1 
             connection.close()
 
 
@@ -416,14 +416,14 @@ def order_review_table_insert_statement():
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
 
 
-            if count < 200:
-                cursor.execute(sql_insert_statement, 
+            
+            cursor.execute(sql_insert_statement, 
                                 (id, order_id, review_id, review_score, review_comment_title,
                                     review_comment_message, review_creation_date, review_answer_timestamp))
                 
-                connection.commit()
-                count += 1 
-                connection.close()
+            connection.commit()
+            count += 1 
+            connection.close()
 
             else:
                 return
@@ -473,14 +473,14 @@ def order_payment_table_insert_statement():
                     VALUES (%s, %s, %s, %s, %s, %s)"
 
 
-            if count < 200:
-                cursor.execute(sql_insert_statement, 
+            
+            cursor.execute(sql_insert_statement, 
                                 (id, order_id, payment_sequential, 
                                     payment_type, payment_installments, payment_value))
 
-                connection.commit()
-                count += 1 
-                connection.close()
+            connection.commit()
+            count += 1 
+            connection.close()
 
 
             else:

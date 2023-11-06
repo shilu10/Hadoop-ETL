@@ -5,6 +5,11 @@ terraform {
       version = "5.2.0"
     }
   }
+
+  backend "gcs" { 
+      bucket  = "hdfs-project-terraform-state-file-backend"
+      prefix  = "prod"
+    }
 }
 
 

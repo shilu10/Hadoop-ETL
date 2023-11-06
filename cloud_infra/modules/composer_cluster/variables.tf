@@ -33,5 +33,7 @@ variable "python_version"{
 	default = "3"
 }
 
-
-
+variable "env_variables" {
+	type = map
+	default = {}
+}

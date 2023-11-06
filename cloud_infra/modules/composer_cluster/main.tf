@@ -22,9 +22,7 @@ resource "google_composer_environment" "this" {
         core-dags_are_paused_at_creation = "True"
       }
 
-      env_variables = {
-        FOO = "bar"
-      }
+      env_variables = var.env_variables
     }
   }
 }

@@ -109,6 +109,21 @@ variable "composer_python_version"{
 	default = "3"
 }
 
+variable "composer_env_variable" {
+	type = map 
+	default = {}
+}
+
+variable "composer_mysql_username" {
+	type = string 
+	default = "username"
+}
+
+variable "composer_mysql_password" {
+	type = string 
+	default = "username"
+}
+
 
 
 variable "bucket_name" {
