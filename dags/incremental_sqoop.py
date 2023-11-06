@@ -30,7 +30,7 @@ sqoop_dag = DAG(
     dag_id='incremental_append_sqoop',
     default_args=default_args,
     # schedule_interval='0 0 * * *',
-    schedule_interval='@once',
+    schedule_interval='@daily',
     start_date=days_ago(1),
     dagrun_timeout=timedelta(minutes=60),
     description='Incremental Append Sqoop',
@@ -38,7 +38,7 @@ sqoop_dag = DAG(
 
 
 bash_command_1 = """
-				  gcloud storage cp gs://us-central1-demo-b9b2f20a-bucket/data/sqoop_incremental_import_1.sh . &&\
+				  gcloud storage cp gs://us-central1-hdfs_project_data_new/scripts/sqoop_incremental_import_1.sh . &&\
 				  bash sqoop_incremental_import_1.sh && \
 				  rm sqoop_incremental_import_1.sh """
 
@@ -52,7 +52,7 @@ sqoop_increment_import_1 = SSHOperator(
 
 
 bash_command_2 = """
-				  gcloud storage cp gs://us-central1-demo-b9b2f20a-bucket/data/sqoop_incremental_import_2.sh . && \
+				  gcloud storage cp gs://us-central1-hdfs_project_data_new/scripts/sqoop_incremental_import_2.sh . && \
 				  bash sqoop_incremental_import_2.sh && \
 				  rm sqoop_incremental_import_2.sh """
 

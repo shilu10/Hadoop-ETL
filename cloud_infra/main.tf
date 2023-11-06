@@ -36,6 +36,11 @@ module "composer_cluster" {
 	composer_name = var.composer_name
 	composer_image_version = var.composer_image_version
 	python_version = "3"
+	env_variable = {
+		"MYSQL_HOST" = module.mysql.db_public_ip_addr,
+		"MYSQL_USERNAME" = var.composer_mysql_username
+		"MYSQL_PASSWORD" = var.composer_mysql_password
+		}
 }
 
 
@@ -55,8 +60,27 @@ resource "google_storage_bucket_object" "data_directory" {
   bucket        = module.storage_bucket.id
 }
 
-resource "google_storage_bucket_object" "extra_file_directory" {
+resource "google_storage_bucket_object" "file_directory" {
   name          = "scripts/"
   content       = "Directory contains a python files"
   bucket        = module.storage_bucket.id
+}
+
+
+resource "null_resource" "run_python" {
+  provisioner "local-exec" {
+    command = "python3 ../scripts/download_kaggle_data.py"
+  }
+}
+
+resource "null_resource" "run_python" {
+  provisioner "local-exec" {
+    command = "bash ../scripts/copy_to_source_bucket.sh"
+  }
+}
+
+resource "null_resource" "run_python" {
+  provisioner "local-exec" {
+    command = "bash ../scripts/update_composer_cluster.sh"
+  }
 }
