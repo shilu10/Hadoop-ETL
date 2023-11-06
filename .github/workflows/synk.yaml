@@ -18,6 +18,8 @@
 
 name: Snyk Security
 
+on: [push]
+
 permissions:
   contents: read
 
