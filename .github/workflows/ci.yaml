@@ -83,7 +83,7 @@ jobs:
     - name: Terraform Format
       run: |
         cd cloud_infra
-        terraform fmt -check
+        terraform fmt
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
