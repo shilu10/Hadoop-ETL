@@ -36,7 +36,7 @@ module "composer_cluster" {
 	composer_name = var.composer_name
 	composer_image_version = var.composer_image_version
 	python_version = "3"
-	env_variable = {
+	env_variables = {
 		"MYSQL_HOST" = module.mysql.db_public_ip_addr,
 		"MYSQL_USERNAME" = var.composer_mysql_username
 		"MYSQL_PASSWORD" = var.composer_mysql_password
