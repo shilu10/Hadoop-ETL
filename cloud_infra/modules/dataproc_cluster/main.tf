@@ -26,20 +26,6 @@ resource "google_dataproc_cluster" "this" {
       }
     }
 
-    worker_config {
-      num_instances    = var.num_worker
-      machine_type     = var.worker_machine_type 
-      min_cpu_platform = "Intel Skylake"
-      disk_config {
-        boot_disk_size_gb = 30
-        num_local_ssds    = 1
-      }
-    }
-
-    preemptible_worker_config {
-      num_instances = 0
-    }
-
     # Override or set some custom properties
     software_config {
       image_version = "2.0.35-debian10"
