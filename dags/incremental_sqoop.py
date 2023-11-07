@@ -23,6 +23,19 @@ default_args = { 'owner': 'shilu',
         }
 
 
+from airflow.models import Connection
+from airflow import settings
+
+def create_conn(username, password, host=None):
+    new_conn = Connection(conn_id=f'{username}_connection',
+                                  login=username,
+                                  host=host if host else None)
+    new_conn.set_password(password)
+
+    session = settings.Session()
+    session.add(new_conn)
+    session.commit()
+
 sshHook = SSHHook(ssh_conn_id='ssh_new1', timeout=None)
 
 
