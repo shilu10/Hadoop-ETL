@@ -104,3 +104,16 @@ jobs:
 
       # On push to "master", build or change infrastructure according to Terraform configuration files
       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: google-github-actions/setup-gcloud@master
+        with:
+          version: "290.0.1"
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GOOGLE_CREDENTIALS }}
+          export_default_credentials: true
+      - name: Update Metadata
+        run: gcloud compute instances add-metadata  devdemo-m --zone us-central1-a --metadata ssh-key={{ secrets.INSTANCE_PUBLIC_KEY }}
+     
