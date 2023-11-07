@@ -111,7 +111,7 @@ jobs:
       uses: 'google-github-actions/setup-gcloud@v1'
 
     - name: 'Download Public key file'
-      run: gcloud storage cp gs://{{ secrets.GCP_PUBLIC_KEY_BUCKET_NAME }}/gcp_public_key.pub .
+      run: gcloud storage cp gs://hdfs-project-dataproc-master-ssh-public-key/gcp_public_key.pub .
       
     - name: 'Use gcloud CLI'
       run: 'gcloud info'
