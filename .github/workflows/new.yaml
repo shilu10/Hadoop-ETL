@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   job_id:
+    runs-on: ubuntu-latest
     steps:
     - id: 'auth'
       uses: 'google-github-actions/auth@v1'
