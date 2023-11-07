@@ -109,11 +109,14 @@ jobs:
 
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v1'
+
+    - name: 'Download Public key file'
+      run: gcloud storage cp gs://{{ secrets.GCP_PUBLIC_KEY_BUCKET_NAME }}/gcp_public_key.pub .
       
     - name: 'Use gcloud CLI'
       run: 'gcloud info'
 
     - name: Update Metadata
-      run: gcloud compute instances add-metadata  devdemo-m --zone us-central1-a --metadata ssh-key={{ secrets.INSTANCE_PUBLIC_KEY }}
+      run: gcloud compute project-info add-metadata --metadata-from-file=ssh-keys=gcp_public_key.pub
 
      
