@@ -3,10 +3,17 @@ from datetime import timedelta
 from airflow import DAG
 from airflow.utils.dates import days_ago
 from airflow.providers.ssh.operators.ssh import SSHOperator
+from airflow.providers.google.cloud.transfers.gcs_to_local import GCSToLocalFilesystemOperator
 #from airflow.operators.mysql_operator import MySqlOperator
 from airflow.operators.dummy import DummyOperator
 from airflow.contrib.hooks.ssh_hook import SSHHook
 from airflow.operators.empty import EmptyOperator
+from airflow.models import Connection
+from airflow import settings
+import os 
+
+DATAPROC_M_HOST = os.environ["DATAPROC_M_HOST"]
+DATAPROC_M_USERNAME = os.environ["DATAPROC_M_USERNAME"]
 
 
 default_args = { 'owner': 'shilu',
@@ -23,20 +30,10 @@ default_args = { 'owner': 'shilu',
         }
 
 
-from airflow.models import Connection
-from airflow import settings
-
-def create_conn(username, password, host=None):
-    new_conn = Connection(conn_id=f'{username}_connection',
-                                  login=username,
-                                  host=host if host else None)
-    new_conn.set_password(password)
-
-    session = settings.Session()
-    session.add(new_conn)
-    session.commit()
-
-sshHook = SSHHook(ssh_conn_id='ssh_new1', timeout=None)
+sshHook = SSHHook(username=DATAPROC_M_USERNAME, 
+				  remote_host=DATAPROC_M_HOST,
+				  key_file="/home/airflow/data/gcp_private_key",
+				  timeout=None)
 
 
 sqoop_dag = DAG(

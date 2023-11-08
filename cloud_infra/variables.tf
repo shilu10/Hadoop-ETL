@@ -72,6 +72,15 @@ variable "dataproc_worker_machine_type" {
 	default = "n1-standard-2"
 }
 
+variable "dataproc_zone" {
+	type = string 
+	default = "us-central1-a"
+}
+
+variable "dataproc_master_username" {
+	type = string 
+	default = "shilu4577"
+}
 
 
 variable "composer_node_count"{
@@ -121,7 +130,7 @@ variable "composer_mysql_username" {
 
 variable "composer_mysql_password" {
 	type = string 
-	default = "username"
+	default = "password"
 }
 
 

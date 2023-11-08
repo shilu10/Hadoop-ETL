@@ -3,6 +3,12 @@ variable "region"{
 	default = "us-central1"
 }
 
+variable "zone" {
+	type = string 
+	default = ""us-central1-a"
+}
+
+
 variable "name" {
 	type = string 
 	default = "devdemo"
