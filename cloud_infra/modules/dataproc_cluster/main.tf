@@ -13,7 +13,7 @@ resource "google_dataproc_cluster" "this" {
   }
 
   cluster_config {
-    zone = var.zone
+
   	endpoint_config {
     	enable_http_port_access = var.enable_http_port_access
   	}
@@ -42,6 +42,7 @@ resource "google_dataproc_cluster" "this" {
       service_account_scopes = [
         "cloud-platform"
       ]
+      zone = var.zone
     }
 
     # You can define multiple initialization_action blocks
