@@ -89,11 +89,7 @@ jobs:
   update:
     name: 'Update infrastructure'
     runs-on: ubuntu-latest
-<<<<<<< HEAD
-    needs: [deployment]
-=======
     needs: [terraform]
->>>>>>> 8e70ae803733d3c58d878a4a4ad771388c284204
     steps:
       - uses: actions/checkout@v2
       - uses: 'google-github-actions/auth@v1'
@@ -146,8 +142,4 @@ jobs:
       - name: Upload Dag to Composer
         run: |
           cd scripts
-<<<<<<< HEAD
           bash upload_dag.sh
-=======
-          bash upload_dag.sh
->>>>>>> 8e70ae803733d3c58d878a4a4ad771388c284204

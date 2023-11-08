@@ -54,11 +54,7 @@ permissions:
 
 jobs:
   terraform:
-<<<<<<< HEAD
-    name: 'Terraform Plan'
-=======
     name: 'Terraform'
->>>>>>> 8e70ae803733d3c58d878a4a4ad771388c284204
     runs-on: ubuntu-latest
     environment: production
 
