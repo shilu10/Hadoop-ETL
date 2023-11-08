@@ -110,7 +110,7 @@ variable "composer_name"{
 
 variable "composer_image_version"{
 	type = string 
-	default = "composer-1.20.12-airflow-1.10.15"
+	default = "composer-1.20.12-airflow-2.4.3"
 }
 
 variable "composer_python_version"{

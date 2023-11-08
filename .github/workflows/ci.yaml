@@ -45,7 +45,8 @@
 name: 'Terraform'
 
 on:
-  push:
+  pull_request:
+    # The branches below must be a subset of the branches above
     branches: [ "master" ]
 
 permissions:
@@ -99,27 +100,3 @@ jobs:
       # On push to "master", build or change infrastructure according to Terraform configuration files
       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
   
-  ## this stage will upload the public to dataproc master node, so it can used by composer.
-
-  deploy:
-    runs-on: ubuntu-latest
-    name: "new stage"
-    steps:
-    - id: 'auth'
-      uses: 'google-github-actions/auth@v1'
-      with:
-        credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
-
-    - name: 'Set up Cloud SDK'
-      uses: 'google-github-actions/setup-gcloud@v1'
-
-    - name: 'Download Public key file'
-      run: gcloud storage cp gs://hdfs-project-dataproc-master-ssh-public-key/gcp_public_key.pub .
-      
-    - name: 'Use gcloud CLI'
-      run: 'gcloud info'
-
-    - name: Update Metadata
-      run: gcloud compute project-info add-metadata --metadata-from-file=ssh-keys=gcp_public_key.pub
-
-     
