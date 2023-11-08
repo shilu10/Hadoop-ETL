@@ -76,6 +76,6 @@ resource "google_storage_bucket_object" "file_directory" {
 
 resource "null_resource" "copy_private_key_file" {
 	provisioner "local-exec" {
-    command = "gcloud storage cp gs://hdfs-project-dataproc-master-ssh-public-key/gcp_private_key ${module.composer_cluster.composer_gcs_dag_prefix}/data"
+    command = "gcloud storage cp gs://hdfs-project-dataproc-master-ssh-public-key/gcp_private_key ${module.composer_cluster.composer_gcs_dag_prefix}/"
   }
 }
