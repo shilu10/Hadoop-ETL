@@ -32,7 +32,7 @@ default_args = { 'owner': 'shilu',
 
 sshHook = SSHHook(username=DATAPROC_M_USERNAME, 
 				  remote_host=DATAPROC_M_HOST,
-				  key_file="/home/airflow/data/gcp_private_key",
+				  key_file="/home/airflow/dags/gcp_private_key",
 				  timeout=None)
 
 

@@ -42,10 +42,11 @@
 #       with:
 #         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-name: 'Terraform'
+name: 'Continuous Integration'
 
 on:
-  push:
+  pull_request:
+    # The branches below must be a subset of the branches above
     branches: [ "master" ]
 
 permissions:
@@ -98,22 +99,4 @@ jobs:
 
       # On push to "master", build or change infrastructure according to Terraform configuration files
       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
-  deploy:
-    runs-on: ubuntu-latest
-    name: "new stage"
-    steps:
-    - id: 'auth'
-      uses: 'google-github-actions/auth@v1'
-      with:
-        credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
-
-    - name: 'Set up Cloud SDK'
-      uses: 'google-github-actions/setup-gcloud@v1'
-      
-    - name: 'Use gcloud CLI'
-      run: 'gcloud info'
-
-    - name: Update Metadata
-      run: gcloud compute instances add-metadata  devdemo-m --zone us-central1-a --metadata ssh-key={{ secrets.INSTANCE_PUBLIC_KEY }}
-
-     
+  
