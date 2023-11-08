@@ -89,7 +89,7 @@ jobs:
   update:
     name: 'Update infrastructure'
     runs-on: ubuntu-latest
-    needs: [terraform]
+    needs: [deployment]
     steps:
       - uses: actions/checkout@v2
       - uses: 'google-github-actions/auth@v1'
