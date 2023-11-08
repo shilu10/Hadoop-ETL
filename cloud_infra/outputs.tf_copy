@@ -10,6 +10,10 @@ output "composer_url" {
 	value = module.composer_cluster.composer_url
 }
 
+output "composer_gcs_dag_prefix" {
+	value = module.composer_cluster.composer_gcs_dag_prefix
+}
+
 
 output "master_instance_names" {
 	value = module.dataproc_cluster.master_instance_names

@@ -13,6 +13,7 @@ resource "google_dataproc_cluster" "this" {
   }
 
   cluster_config {
+    zone = var.zone
   	endpoint_config {
     	enable_http_port_access = var.enable_http_port_access
   	}
