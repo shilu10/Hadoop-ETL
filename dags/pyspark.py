@@ -65,6 +65,14 @@ CUS_PYSPARK_JOB = {
    "pyspark_job": {"main_python_file_uri": CUSTOMER_PYSPARK_URI},
    }
 
+PRODUCT_PYSPARK_JOB = {
+   "reference": {"project_id": PROJECT_ID},
+   "placement": {"cluster_name": CLUSTER_NAME},
+   "pyspark_job": {"main_python_file_uri": PRODUCT_PYSPARK_URI},
+   }
+
+
+
 GEOLOCATION_PYSPARK_JOB = {
    "reference": {"project_id": PROJECT_ID},
    "placement": {"cluster_name": CLUSTER_NAME},
@@ -100,13 +108,6 @@ ORDER_ITEM_PYSPARK_JOB = {
    "placement": {"cluster_name": CLUSTER_NAME},
    "pyspark_job": {"main_python_file_uri": ORDER_ITEM_PYSPARK_URI},
    }
-
-PRODUCT_PYSPARK_JOB = {
-   "reference": {"project_id": PROJECT_ID},
-   "placement": {"cluster_name": CLUSTER_NAME},
-   "pyspark_job": {"main_python_file_uri": PRODUCT_PYSPARK_URI},
-   }
-
 
 
 cust_pyspark_task = DataprocSubmitJobOperator(
@@ -173,7 +174,4 @@ order_pyspark_task = DataprocSubmitJobOperator(
        dag=pyspark_dag, 
    )
 
-
 cust_pyspark_task >> geolocation_pyspark_task >> seller_pyspark_task >> product_pyspark_task >> order_pyspark_task >> order_review_pyspark_task >> order_payment_pyspark_task >> order_item_pyspark_task
-
-
